@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database Angkatan 2022</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --border: #2a2a3a;
+    --success: #43d9a2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .blob1 {
+    position: fixed; top: -200px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .blob2 {
+    position: fixed; bottom: -150px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,101,132,0.1) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .header-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-num {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px 12px 44px;
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--accent), #8b85ff);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .view-toggle {
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .view-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+
+  .view-btn.active { background: var(--accent); color: white; }
+
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    padding: 14px 20px;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  th:hover { color: var(--text); }
+
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(108,99,255,0.04); }
+
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .name-info .name { font-weight: 600; font-size: 14px; }
+  .name-info .npm {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .contact-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .contact-link:hover { opacity: 0.7; }
+
+  /* GRID VIEW */
+  .grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .member-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .member-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .card-avatar {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .card-name { font-weight: 700; font-size: 14px; line-height: 1.3; }
+  .card-npm {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+  }
+
+  .card-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .card-icon { color: var(--muted); font-size: 13px; flex-shrink: 0; }
+  .card-row a { color: var(--accent); text-decoration: none; font-family: 'Space Mono', monospace; font-size: 11px; }
+  .card-row a:hover { opacity: 0.7; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 520px;
+    animation: modalIn 0.25s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-title { font-size: 20px; font-weight: 800; }
+
+  .modal-close {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { color: var(--text); border-color: var(--accent); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input[type="text"], input[type="tel"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { color: var(--text); border-color: var(--accent); }
+
+  .btn-save {
+    background: linear-gradient(135deg, var(--accent), #8b85ff);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-save:hover { opacity: 0.9; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 7px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: background 0.2s;
+    color: var(--muted);
+  }
+
+  .action-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+  .action-btn.del:hover { color: var(--accent2); }
+
+  .hidden { display: none !important; }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .page-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .page-btn:hover { border-color: var(--accent); color: var(--text); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .page-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0 8px;
+  }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 500px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob1"></div>
+<div class="blob2"></div>
+
+<div class="container">
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="header-badge">// SISTEM INFORMASI ANGKATAN</div>
+        <h1>Database<br><span>Angkatan 2022</span></h1>
+        <div class="header-meta">Total <span id="stat-total">97</span> Mahasiswa Terdaftar</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num" id="stat-count">97</span>
+          <span class="stat-label">Mahasiswa</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="stat-shown">20</span>
+          <span class="stat-label">Ditampilkan</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Cari nama atau NPM...">
+    </div>
+    <select id="per-page" onchange="changePerPage()">
+      <option value="20">20 per halaman</option>
+      <option value="50">50 per halaman</option>
+      <option value="100">Semua</option>
+    </select>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-table" title="Tabel" onclick="setView('table')">☰</button>
+      <button class="view-btn" id="btn-grid" title="Grid" onclick="setView('grid')">⊞</button>
+    </div>
+    <button class="btn-add" onclick="openModal()">＋ Tambah</button>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div id="table-view">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortBy('nama')">Nama ↕</th>
+            <th onclick="sortBy('npm')">NPM ↕</th>
+            <th>No. WA</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty-state hidden" id="empty-table">
+        <div class="icon">🔍</div>
+        <p>Tidak ada data ditemukan</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID VIEW -->
+  <div id="grid-view" class="grid-view hidden"></div>
+  <div class="empty-state hidden" id="empty-grid">
+    <div class="icon">🔍</div>
+    <p>Tidak ada data ditemukan</p>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Tambah Mahasiswa</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nama Lengkap</label>
+        <input type="text" id="f-nama" placeholder="Nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>NPM</label>
+        <input type="text" id="f-npm" placeholder="23012022XXXX">
+      </div>
+      <div class="form-group">
+        <label>No. WhatsApp</label>
+        <input type="tel" id="f-wa" placeholder="08XXXXXXXXXX">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="btn-save" onclick="saveData()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = [
+  ['#ff6584','#2a1520'],['#6c63ff','#1a1830'],['#43d9a2','#0d2320'],
+  ['#ffc850','#231e0d'],['#60a5fa','#0d1a2a'],['#f472b6','#241020'],
+  ['#34d399','#0a2018'],['#a78bfa','#1a1530'],['#fb923c','#231508'],
+  ['#38bdf8','#0a1e2a'],['#e879f9','#200a24'],['#4ade80','#0a2014']
+];
+
+let data = [
+  { id:1, npm:"230120220001", nama:"Gerardo Gaudentius Sautraja Silalahi", wa:"0895330672712" },
+  { id:2, npm:"230120220002", nama:"Nanda Nasir Tsaury", wa:"081395460199" },
+  { id:3, npm:"230120220003", nama:"Elmi Aini Miliki", wa:"089602133555" },
+  { id:4, npm:"230120220004", nama:"Nadya Clarissa Sidney", wa:"085720974738" },
+  { id:5, npm:"230120220005", nama:"Fira Humaira", wa:"081906605022" },
+  { id:6, npm:"230120220006", nama:"Irsyad Muhammad Habibie", wa:"088212893862" },
+  { id:7, npm:"230120220007", nama:"Nabila Nurkhalizah Ismail", wa:"081519153988" },
+  { id:8, npm:"230120220008", nama:"Fa'iz Maradona", wa:"081385085787" },
+  { id:9, npm:"230120220009", nama:"Nelly Oktaviani Masode", wa:"081222963782" },
+  { id:10, npm:"230120220010", nama:"Nanda Annisa", wa:"089663296386" },
+  { id:11, npm:"230120220011", nama:"Nayadiva Shafinka", wa:"081395188050" },
+  { id:12, npm:"230120220012", nama:"Dhan Dhan Elita", wa:"085659724476" },
+  { id:13, npm:"230210220013", nama:"Zahran Naldi Fahrezi", wa:"087775065593" },
+  { id:14, npm:"230120220014", nama:"Adrian Nawfal Darmaza", wa:"089604105029" },
+  { id:15, npm:"230120220015", nama:"Sheva Fathunnisa Ahmad", wa:"0895636931442" },
+  { id:16, npm:"230120220016", nama:"Nayla Shofwatun Nisa", wa:"082123166791" },
+  { id:17, npm:"230120220017", nama:"Nadhira Fasya Victoria", wa:"081395808834" },
+  { id:18, npm:"230120220018", nama:"Valerin Septhianny", wa:"081222385932" },
+  { id:19, npm:"230120220019", nama:"Nanda Alia Salsabilah", wa:"08561851682" },
+  { id:20, npm:"230120220020", nama:"Aziz Aprian Pangkerego", wa:"081313249246" },
+  { id:21, npm:"230120220021", nama:"Nissa Rinka Rabbani", wa:"089660460837" },
+  { id:22, npm:"230120220022", nama:"Zahrani Salsabila", wa:"081398909081" },
+  { id:23, npm:"230120220023", nama:"Muhammad Rizki Akbar", wa:"085321255381" },
+  { id:24, npm:"230120220024", nama:"Nisriinaa Dwi Putri", wa:"085222021573" },
+  { id:25, npm:"230120220025", nama:"Dika Hayyan Prasetya", wa:"0895422915937" },
+  { id:26, npm:"230120220027", nama:"Teuku Shaumul Huseen", wa:"085171556261" },
+  { id:27, npm:"230120220028", nama:"Muhammad Arsyi Ghani Giffari", wa:"088802246148" },
+  { id:28, npm:"230120220029", nama:"Rosda Teja Kusumawati", wa:"082219088841" },
+  { id:29, npm:"230120220031", nama:"Wafa Amani Mashury", wa:"081210632487" },
+  { id:30, npm:"230120220032", nama:"Mohamad Akbar Nahara Meru", wa:"081297790334" },
+  { id:31, npm:"230120220033", nama:"Adrians Maulana Aziz", wa:"081224815058" },
+  { id:32, npm:"230120220034", nama:"Agam Rachmat Dwi Utama", wa:"08158291417" },
+  { id:33, npm:"230120220035", nama:"Haryudhanto H. P.", wa:"087783082309" },
+  { id:34, npm:"230120220036", nama:"Almer Beryl Adifta", wa:"089651502155" },
+  { id:35, npm:"230120220038", nama:"Mochammad Zain Al Fatoni", wa:"089507224070" },
+  { id:36, npm:"230120220039", nama:"Citra Nur Ilahiyah", wa:"087771564065" },
+  { id:37, npm:"230120220040", nama:"Giyats Nabhan Auf", wa:"0895801006888" },
+  { id:38, npm:"230120220042", nama:"Wisnu Rizki Susilo", wa:"085711142979" },
+  { id:39, npm:"230120220043", nama:"Muhammad Azkal Azkiya", wa:"081223323228" },
+  { id:40, npm:"230120220044", nama:"R. Muhammad Gzibral", wa:"082130861116" },
+  { id:41, npm:"230120220045", nama:"Arifanda Farhan Rizqillah", wa:"081223013889" },
+  { id:42, npm:"230120220046", nama:"Muhammad Raihan Hidayat", wa:"087778795986" },
+  { id:43, npm:"230120220047", nama:"Fauzi Aulia Rahman", wa:"081573256964" },
+  { id:44, npm:"230120220048", nama:"Nur Asmi Khaerunnisa", wa:"089531132258" },
+  { id:45, npm:"230120220049", nama:"Muhammad Rezza S", wa:"081222167909" },
+  { id:46, npm:"230120220050", nama:"Annastasya Asti Dewi", wa:"081573037044" },
+  { id:47, npm:"230210220051", nama:"Emir Muhammad Pramadyan", wa:"087825786720" },
+  { id:48, npm:"230210220052", nama:"Jiro Orion", wa:"081222533389" },
+  { id:49, npm:"230210220053", nama:"Muhammad Ridwan Al-Awwabiin", wa:"087773082504" },
+  { id:50, npm:"230210220054", nama:"Naufal Ramadhan", wa:"081266699829" },
+  { id:51, npm:"230210220055", nama:"Haura Azalia Putri Fardian", wa:"0895402941523" },
+  { id:52, npm:"230210220056", nama:"Aisyah Nurhalimah", wa:"081213656179" },
+  { id:53, npm:"230210220057", nama:"M. Faldi Arrahman", wa:"082145555526" },
+  { id:54, npm:"230210220058", nama:"Bellaputeri", wa:"089646647848" },
+  { id:55, npm:"230210220059", nama:"Fataya Alif Rahmani Priatna", wa:"089674300024" },
+  { id:56, npm:"230210220060", nama:"Naufal Ahsyan", wa:"08212895428" },
+  { id:57, npm:"230210220061", nama:"Haykal Luthfi Kazhimi Siregar", wa:"6289607775693" },
+  { id:58, npm:"230210220062", nama:"Kirani Cessa Audia", wa:"087875309043" },
+  { id:59, npm:"230210220063", nama:"Surya Albani", wa:"0895416471572" },
+  { id:60, npm:"230210220064", nama:"Ichsan Darmawan", wa:"085320077191" },
+  { id:61, npm:"230210220065", nama:"Rifqi Diyan Nugraha", wa:"081574223532" },
+  { id:62, npm:"230210220066", nama:"Jogi Ruben Natanael Panggabea", wa:"08116182612" },
+  { id:63, npm:"230210220067", nama:"Hilmi Fawwaz Putra", wa:"081221879606" },
+  { id:64, npm:"230210220068", nama:"Muhamad Dafly Akbar", wa:"085155434612" },
+  { id:65, npm:"230210220070", nama:"Aulia Ziani Al-Fazry", wa:"087814075073" },
+  { id:66, npm:"230210220071", nama:"Ranisaa Septiana Jurika", wa:"089679493371" },
+  { id:67, npm:"230210220072", nama:"Muhammad Rifqi Alpha Satriya", wa:"085714260121" },
+  { id:68, npm:"230210220073", nama:"Satria Sandi Pratama", wa:"085894790656" },
+  { id:69, npm:"230210220074", nama:"Bq Qhiswa Putri", wa:"087743324779" },
+  { id:70, npm:"230210220075", nama:"Khezia Tiurma Jachintya S", wa:"089660173845" },
+  { id:71, npm:"230210220076", nama:"M Fatan Razaqa", wa:"085819408910" },
+  { id:72, npm:"230210220077", nama:"Adelia Yasin", wa:"082213382096" },
+  { id:73, npm:"230210220078", nama:"Margaretha Angeline Situmorang", wa:"081371253389" },
+  { id:74, npm:"230210220079", nama:"Athariq Zidan Hamdani", wa:"081221501660" },
+  { id:75, npm:"230210220082", nama:"David Ferdinand Sinaga", wa:"085761405394" },
+  { id:76, npm:"230210220083", nama:"Hiskia Abel Perdana Ardi", wa:"081228250858" },
+  { id:77, npm:"230210220085", nama:"Kathryn Trijatha Putri Rahayu", wa:"081262305360" },
+  { id:78, npm:"230210220086", nama:"Nisrina Sahidatunisa", wa:"088218602307" },
+  { id:79, npm:"230210220087", nama:"Julian Kurnia", wa:"089696462436" },
+  { id:80, npm:"230210220088", nama:"Galuh Pramudya", wa:"081225684573" },
+  { id:81, npm:"230210220089", nama:"Intan Sugiarti", wa:"087794630028" },
+  { id:82, npm:"230210220091", nama:"Ramones Telaum Banua", wa:"085879719644" },
+  { id:83, npm:"230210220092", nama:"Yenni Tri Ayundawati", wa:"085331224384" },
+  { id:84, npm:"230210220093", nama:"Ritzky Malona", wa:"082180768345" },
+  { id:85, npm:"230210220094", nama:"Carolina Angel", wa:"082188094224" },
+  { id:86, npm:"230210220095", nama:"Bagus Dwi Cahyo", wa:"085786584964" },
+  { id:87, npm:"230210220096", nama:"Muhammad Farhan", wa:"082384742312" },
+  { id:88, npm:"230210220097", nama:"Adam Bintang Hastanto", wa:"082133784706" },
+  { id:89, npm:"230210220100", nama:"Nailil Izzah", wa:"087738161460" },
+  { id:90, npm:"230210220102", nama:"Bintang Azahra", wa:"08812618978" },
+  { id:91, npm:"230210220103", nama:"Ferima Lenawati", wa:"08990161158" },
+  { id:92, npm:"230210220104", nama:"Diky Darmawan", wa:"082220861617" },
+  { id:93, npm:"230210220105", nama:"Zaenal Lael Nurhafidien", wa:"083871304660" },
+  { id:94, npm:"230210220106", nama:"Rahma Dewi Nurwiyati", wa:"089637782212" },
+  { id:95, npm:"230210220107", nama:"Sahwahita Raisya Putri Ariwibowo", wa:"085704990159" },
+  { id:96, npm:"230210220108", nama:"Nurhaliza Winda Puspita", wa:"085743728548" },
+  { id:97, npm:"230210220001", nama:"Alexandra Lidya T S", wa:"081311308157" },
+];
+
+let nextId = 98;
+let currentView = 'table';
+let sortKey = null, sortAsc = true;
+let editingId = null;
+let currentPage = 1;
+let perPage = 20;
+
+function getInitials(name) {
+  return name.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+function getColor(id) { return COLORS[(id-1) % COLORS.length]; }
+
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  let filtered = data.filter(m =>
+    !q || m.nama.toLowerCase().includes(q) || m.npm.includes(q) || m.wa.includes(q)
+  );
+  if (sortKey) {
+    filtered.sort((a,b) => {
+      const r = a[sortKey].localeCompare(b[sortKey]);
+      return sortAsc ? r : -r;
+    });
+  }
+  return filtered;
+}
+
+function getPaged(filtered) {
+  if (perPage >= filtered.length) return filtered;
+  const start = (currentPage - 1) * perPage;
+  return filtered.slice(start, start + perPage);
+}
+
+function render() {
+  const filtered = getFiltered();
+  const paged = getPaged(filtered);
+
+  document.getElementById('stat-count').textContent = filtered.length;
+  document.getElementById('stat-shown').textContent = paged.length;
+  document.getElementById('stat-total').textContent = data.length;
+
+  renderTable(paged, filtered);
+  renderGrid(paged, filtered);
+  renderPagination(filtered.length);
+}
+
+function renderTable(paged, filtered) {
+  const tbody = document.getElementById('table-body');
+  const empty = document.getElementById('empty-table');
+
+  if (!paged.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const startNum = (currentPage - 1) * perPage + 1;
+  tbody.innerHTML = paged.map((m, i) => {
+    const [fg, bg] = getColor(m.id);
+    const waClean = m.wa.replace(/\s/g,'');
+    const waLink = waClean.startsWith('62') ? waClean : '62' + waClean.replace(/^0/,'');
+    return `<tr>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">${startNum+i}</td>
+      <td>
+        <div class="name-cell">
+          <div class="avatar" style="background:${bg};color:${fg}">${getInitials(m.nama)}</div>
+          <div class="name-info">
+            <div class="name">${m.nama}</div>
+            <div class="npm">${m.npm}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">${m.npm}</td>
+      <td><a class="contact-link" href="https://wa.me/${waLink}" target="_blank">📱 ${m.wa}</a></td>
+      <td>
+        <button class="action-btn" onclick="editData(${m.id})" title="Edit">✎</button>
+        <button class="action-btn del" onclick="deleteData(${m.id})" title="Hapus">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderGrid(paged, filtered) {
+  const grid = document.getElementById('grid-view');
+  const empty = document.getElementById('empty-grid');
+
+  if (!paged.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  grid.innerHTML = paged.map((m, i) => {
+    const [fg, bg] = getColor(m.id);
+    const waClean = m.wa.replace(/\s/g,'');
+    const waLink = waClean.startsWith('62') ? waClean : '62' + waClean.replace(/^0/,'');
+    return `<div class="member-card" style="animation-delay:${i*0.03}s">
+      <div class="card-top">
+        <div class="card-avatar" style="background:${bg};color:${fg}">${getInitials(m.nama)}</div>
+        <div>
+          <div class="card-name">${m.nama}</div>
+          <div class="card-npm">${m.npm}</div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-row"><span class="card-icon">📱</span><a href="https://wa.me/${waLink}" target="_blank">${m.wa}</a></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="action-btn" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted)" onclick="editData(${m.id})">✎ Edit</button>
+        <button class="action-btn del" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="deleteData(${m.id})">✕ Hapus</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPagination(total) {
+  const pg = document.getElementById('pagination');
+  if (perPage >= total) { pg.innerHTML = ''; return; }
+
+  const totalPages = Math.ceil(total / perPage);
+  let html = '';
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
+
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 2) {
+      html += `<span class="page-info">…</span>`;
+    }
+  }
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
+  html += `<span class="page-info">${(currentPage-1)*perPage+1}–${Math.min(currentPage*perPage,total)} dari ${total}</span>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  const filtered = getFiltered();
+  const totalPages = Math.ceil(filtered.length / perPage);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function changePerPage() {
+  perPage = parseInt(document.getElementById('per-page').value);
+  currentPage = 1;
+  render();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('table-view').classList.toggle('hidden', v !== 'table');
+  document.getElementById('grid-view').classList.toggle('hidden', v !== 'grid');
+  document.getElementById('empty-grid').classList.add('hidden');
+  document.getElementById('btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('btn-grid').classList.toggle('active', v === 'grid');
+  render();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = true; }
+  render();
+}
+
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modal-title').textContent = id ? 'Edit Mahasiswa' : 'Tambah Mahasiswa';
+  if (id) {
+    const m = data.find(d => d.id === id);
+    document.getElementById('f-nama').value = m.nama;
+    document.getElementById('f-npm').value = m.npm;
+    document.getElementById('f-wa').value = m.wa;
+  } else {
+    ['f-nama','f-npm','f-wa'].forEach(fid => document.getElementById(fid).value = '');
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+function saveData() {
+  const nama = document.getElementById('f-nama').value.trim();
+  const npm = document.getElementById('f-npm').value.trim();
+  if (!nama || !npm) { alert('Nama dan NPM wajib diisi!'); return; }
+  const entry = {
+    id: editingId || nextId++,
+    nama, npm,
+    wa: document.getElementById('f-wa').value.trim(),
+  };
+  if (editingId) {
+    data = data.map(d => d.id === editingId ? entry : d);
+  } else {
+    data.push(entry);
+  }
+  closeModal();
+  render();
+}
+
+function editData(id) { openModal(id); }
+
+function deleteData(id) {
+  const m = data.find(d => d.id === id);
+  if (confirm(`Hapus ${m.nama}?`)) {
+    data = data.filter(d => d.id !== id);
+    render();
+  }
+}
+
+document.getElementById('search').addEventListener('input', () => { currentPage = 1; render(); });
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+render();
+</script>
+</body>
+</html>
