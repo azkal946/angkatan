@@ -1096,7 +1096,7 @@ body.admin-mode .page { padding-top: calc(70px + 38px); }
       <p class="hero-sub">Universitas Padjadjaran · Fakultas Perikanan dan Ilmu Kelautan</p>
       <div class="hero-stats">
         <div class="hero-stat">
-          <span class="hero-stat-num">97</span>
+          <span class="hero-stat-num" id="home-db-count">97</span>
           <span class="hero-stat-label">Mahasiswa</span>
         </div>
         <div class="hero-stat">
@@ -1920,6 +1920,7 @@ function deleteOrg(id) {
 
 // ============ HOME STATS ============
 function updateHomeStats() {
+  document.getElementById('home-db-count').textContent = data.length;
   document.getElementById('home-ta-count').textContent = taData.length;
   document.getElementById('home-org-count').textContent = orgData.length;
 }
@@ -1927,6 +1928,7 @@ function updateHomeStats() {
 // Init
 dbRender();
 taRender();
+updateHomeStats();
 </script>
 </body>
 </html>
