@@ -902,6 +902,122 @@ footer span { color: var(--ocean); }
 
 .hidden { display: none !important; }
 
+/* ========= ADMIN SYSTEM ========= */
+#admin-fab {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 2000;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(15,21,32,0.7);
+  border: 1px solid rgba(14,165,233,0.2);
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s;
+  backdrop-filter: blur(10px);
+}
+#admin-fab:hover { border-color: var(--ocean); color: var(--ocean); }
+#admin-fab.logged-in { border-color: var(--ocean); color: var(--ocean); background: rgba(14,165,233,0.12); }
+
+#admin-login-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 3000;
+  background: rgba(8,12,20,0.85);
+  backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
+}
+#admin-login-overlay.open { display: flex; }
+
+#admin-login-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%; max-width: 380px;
+  animation: modalIn 0.25s ease;
+}
+#admin-login-box h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  margin-bottom: 6px;
+}
+#admin-login-box p {
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 28px;
+}
+.admin-field { margin-bottom: 18px; }
+.admin-field label {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 8px;
+}
+.admin-field input {
+  width: 100%;
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+.admin-field input:focus { border-color: var(--ocean); }
+.admin-err {
+  font-size: 12px; color: #f87171;
+  margin-bottom: 14px; min-height: 18px;
+  text-align: center;
+}
+.admin-btns { display: flex; gap: 10px; margin-top: 6px; }
+.admin-btns button {
+  flex: 1; padding: 12px;
+  border-radius: 10px; border: none;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-admin-cancel {
+  background: transparent;
+  border: 1px solid var(--border) !important;
+  color: var(--muted);
+}
+.btn-admin-cancel:hover { color: var(--text); }
+.btn-admin-login {
+  background: linear-gradient(135deg, var(--ocean), var(--ocean2));
+  color: white;
+}
+.btn-admin-login:hover { opacity: 0.9; transform: translateY(-1px); }
+
+#admin-status-bar {
+  display: none;
+  position: fixed; top: 70px; left: 0; right: 0;
+  z-index: 999;
+  background: linear-gradient(90deg, rgba(14,165,233,0.12), rgba(6,182,212,0.08));
+  border-bottom: 1px solid rgba(14,165,233,0.25);
+  padding: 8px 48px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--ocean);
+  display: none; align-items: center; justify-content: space-between;
+}
+#admin-status-bar.visible { display: flex; }
+#admin-status-bar button {
+  background: transparent; border: 1px solid rgba(14,165,233,0.3);
+  color: var(--ocean); border-radius: 6px;
+  padding: 4px 12px; font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer; transition: all 0.2s;
+}
+#admin-status-bar button:hover { background: rgba(14,165,233,0.1); }
+
+/* edit buttons only show in admin mode */
+.admin-only { display: none !important; }
+body.admin-mode .admin-only { display: inline-flex !important; }
+body.admin-mode .page { padding-top: calc(70px + 38px); }
+
 @media (max-width: 768px) {
   nav { padding: 0 20px; }
   .nav-links { gap: 0; }
@@ -934,6 +1050,36 @@ footer span { color: var(--ocean); }
     <li><a onclick="showPage('org')" id="nav-org">🏛 Organisasi</a></li>
   </ul>
 </nav>
+
+<!-- ADMIN STATUS BAR -->
+<div id="admin-status-bar">
+  <span>⚙ MODE ADMIN AKTIF — <span id="admin-username-display"></span></span>
+  <button onclick="adminLogout()">Keluar</button>
+</div>
+
+<!-- ADMIN FAB -->
+<button id="admin-fab" onclick="adminFabClick()" title="Admin Login">🔒</button>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="admin-login-overlay">
+  <div id="admin-login-box">
+    <h2>Admin Login</h2>
+    <p>Masukkan kredensial untuk mengakses mode edit.</p>
+    <div class="admin-field">
+      <label>Username</label>
+      <input type="text" id="admin-input-user" placeholder="Username" autocomplete="off">
+    </div>
+    <div class="admin-field">
+      <label>Password</label>
+      <input type="password" id="admin-input-pass" placeholder="Password" onkeydown="if(event.key==='Enter')adminDoLogin()">
+    </div>
+    <div class="admin-err" id="admin-err"></div>
+    <div class="admin-btns">
+      <button class="btn-admin-cancel" onclick="adminCloseLogin()">Batal</button>
+      <button class="btn-admin-login" onclick="adminDoLogin()">Masuk</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== HOME PAGE ===== -->
 <div class="page active" id="page-home">
@@ -1023,7 +1169,7 @@ footer span { color: var(--ocean); }
           <button class="view-btn active" id="btn-table" onclick="dbSetView('table')">☰</button>
           <button class="view-btn" id="btn-grid" onclick="dbSetView('grid')">⊞</button>
         </div>
-
+        <button class="btn-add admin-only" onclick="openDbModal()">＋ Tambah</button>
       </div>
 
       <div id="db-table-view">
@@ -1035,6 +1181,7 @@ footer span { color: var(--ocean); }
                 <th onclick="dbSort('nama')">Nama ↕</th>
                 <th onclick="dbSort('npm')">NPM ↕</th>
                 <th>No. WA</th>
+                <th class="admin-only">Aksi</th>
 
               </tr>
             </thead>
@@ -1075,7 +1222,7 @@ footer span { color: var(--ocean); }
           <option value="Proses">🔄 Proses</option>
           <option value="Belum">⏳ Belum</option>
         </select>
-
+        <button class="btn-add admin-only" onclick="openTaModal()">＋ Tambah TA</button>
       </div>
 
       <div class="ta-grid" id="ta-grid"></div>
@@ -1103,12 +1250,94 @@ footer span { color: var(--ocean); }
 
       <div id="org-divisi-container"></div>
 
-
+      <div style="margin-top:32px;text-align:center">
+        <button class="btn-add admin-only" onclick="openOrgModal()">＋ Tambah Pengurus</button>
+      </div>
     </div>
   </section>
 </div>
 
 
+
+
+
+<!-- MODAL DATABASE -->
+<div class="modal-overlay" id="db-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="db-modal-title">Tambah Mahasiswa</div>
+      <button class="modal-close" onclick="closeDbModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nama Lengkap</label><input type="text" id="db-f-nama" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>NPM</label><input type="text" id="db-f-npm" placeholder="23012022XXXX"></div>
+      <div class="form-group"><label>No. WhatsApp</label><input type="tel" id="db-f-wa" placeholder="08XXXXXXXXXX"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeDbModal()">Batal</button>
+      <button class="btn-save" onclick="saveDbData()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TA -->
+<div class="modal-overlay" id="ta-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="ta-modal-title">Tambah Data TA</div>
+      <button class="modal-close" onclick="closeTaModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nama Mahasiswa</label><input type="text" id="ta-f-nama" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>NPM</label><input type="text" id="ta-f-npm" placeholder="23012022XXXX"></div>
+      <div class="form-group">
+        <label>Status TA</label>
+        <select class="form-select" id="ta-f-status">
+          <option value="Belum">⏳ Belum Mulai</option>
+          <option value="Proses">🔄 Sedang Proses</option>
+          <option value="Selesai">✅ Selesai</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Judul TA</label><input type="text" id="ta-f-judul" placeholder="Judul tugas akhir"></div>
+      <div class="form-group"><label>Pembimbing 1</label><input type="text" id="ta-f-pemb1" placeholder="Nama pembimbing"></div>
+      <div class="form-group"><label>Pembimbing 2</label><input type="text" id="ta-f-pemb2" placeholder="Nama pembimbing (opsional)"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeTaModal()">Batal</button>
+      <button class="btn-save" onclick="saveTaData()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ORG -->
+<div class="modal-overlay" id="org-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Pengurus</div>
+      <button class="modal-close" onclick="closeOrgModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nama</label><input type="text" id="org-f-nama" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>NPM</label><input type="text" id="org-f-npm" placeholder="NPM"></div>
+      <div class="form-group">
+        <label>Jabatan</label>
+        <select class="form-select" id="org-f-jabatan">
+          <option>Ketua Umum</option>
+          <option>Wakil Ketua</option>
+          <option>Sekretaris Umum</option>
+          <option>Bendahara Umum</option>
+          <option>Ketua Divisi</option>
+          <option>Anggota Divisi</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Divisi</label><input type="text" id="org-f-divisi" placeholder="Contoh: Akademik, Sosial..."></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeOrgModal()">Batal</button>
+      <button class="btn-save" onclick="saveOrgData()">Simpan</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ============ NAVIGATION ============
@@ -1133,6 +1362,68 @@ const COLORS = [
 ];
 function getColor(id) { return COLORS[(id-1) % COLORS.length]; }
 function getInitials(name) { return name.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+// ============ ADMIN SYSTEM ============
+const ADMINS = [
+  { username: "himaika_admin", password: "Kelautan2022!" },
+  { username: "sekretaris", password: "Ika2022Unpad" },
+];
+
+let adminLoggedIn = false;
+let adminCurrentUser = null;
+
+function adminFabClick() {
+  if(adminLoggedIn) {
+    if(confirm(`Keluar dari mode admin (${adminCurrentUser})?`)) adminLogout();
+  } else {
+    document.getElementById('admin-login-overlay').classList.add('open');
+    setTimeout(()=>document.getElementById('admin-input-user').focus(), 100);
+  }
+}
+
+function adminCloseLogin() {
+  document.getElementById('admin-login-overlay').classList.remove('open');
+  document.getElementById('admin-input-user').value = '';
+  document.getElementById('admin-input-pass').value = '';
+  document.getElementById('admin-err').textContent = '';
+}
+
+function adminDoLogin() {
+  const u = document.getElementById('admin-input-user').value.trim();
+  const p = document.getElementById('admin-input-pass').value;
+  const match = ADMINS.find(a => a.username === u && a.password === p);
+  if(match) {
+    adminLoggedIn = true;
+    adminCurrentUser = u;
+    document.body.classList.add('admin-mode');
+    document.getElementById('admin-fab').classList.add('logged-in');
+    document.getElementById('admin-fab').textContent = '🔓';
+    document.getElementById('admin-fab').title = 'Keluar Admin';
+    document.getElementById('admin-status-bar').classList.add('visible');
+    document.getElementById('admin-username-display').textContent = u;
+    adminCloseLogin();
+    dbRender(); taRender(); orgRender();
+  } else {
+    document.getElementById('admin-err').textContent = '✕ Username atau password salah';
+    document.getElementById('admin-input-pass').value = '';
+    document.getElementById('admin-input-pass').focus();
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  adminCurrentUser = null;
+  document.body.classList.remove('admin-mode');
+  document.getElementById('admin-fab').classList.remove('logged-in');
+  document.getElementById('admin-fab').textContent = '🔒';
+  document.getElementById('admin-fab').title = 'Admin Login';
+  document.getElementById('admin-status-bar').classList.remove('visible');
+  dbRender(); taRender(); orgRender();
+}
+
+document.getElementById('admin-login-overlay').addEventListener('click', e => {
+  if(e.target === e.currentTarget) adminCloseLogin();
+});
 
 // ============ DATABASE ============
 let data = [
@@ -1234,7 +1525,6 @@ let data = [
   { id:96, npm:"230210220108", nama:"Nurhaliza Winda Puspita", wa:"085743728548" },
   { id:97, npm:"230210220001", nama:"Alexandra Lidya T S", wa:"081311308157" },
 ];
-let dbNextId = 98;
 let dbView = 'table', dbSortKey = null, dbSortAsc = true;
 let dbPage = 1, dbPerPage = 20;
 
@@ -1269,7 +1559,10 @@ function dbRender() {
         </div></td>
         <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">${m.npm}</td>
         <td><a class="contact-link" href="https://wa.me/${waLink}" target="_blank">📱 ${m.wa}</a></td>
-
+        ${adminLoggedIn ? `<td>
+          <button class="action-btn" onclick="openDbModal(${m.id})">✎</button>
+          <button class="action-btn del" onclick="deleteDb(${m.id})">✕</button>
+        </td>` : ''}
       </tr>`;
     }).join('');
   }
@@ -1291,7 +1584,10 @@ function dbRender() {
         </div>
         <div class="card-divider"></div>
         <div class="card-row">📱 <a href="https://wa.me/${waLink}" target="_blank">${m.wa}</a></div>
-
+        ${adminLoggedIn ? `<div style="display:flex;gap:8px;margin-top:12px">
+          <button class="action-btn" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="openDbModal(${m.id})">✎ Edit</button>
+          <button class="action-btn del" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="deleteDb(${m.id})">✕ Hapus</button>
+        </div>` : ''}
       </div>`;
     }).join('');
   }
@@ -1466,7 +1762,10 @@ function taRender() {
         ${t.pemb1?`Pembimbing: <span>${t.pemb1}</span>`:''}<br>
         ${t.pemb2?`Co-Pembimbing: <span>${t.pemb2}</span>`:''}
       </div>
-
+      ${adminLoggedIn ? `<div style="display:flex;gap:8px;margin-top:14px">
+        <button class="action-btn" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="openTaModal(${t.id})">✎ Edit</button>
+        <button class="action-btn del" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="deleteTa(${t.id})">✕</button>
+      </div>` : ''}
     </div>`;
   }).join('');
   updateHomeStats();
@@ -1519,9 +1818,103 @@ function orgCardHTML(o, isChief) {
     <div class="org-role">${o.jabatan}</div>
     <div class="org-name">${o.nama}</div>
     <div class="org-npm">${o.npm}</div>
-
+    ${adminLoggedIn ? `<div style="display:flex;gap:6px;margin-top:12px;justify-content:center">
+      <button class="action-btn del" style="border:1px solid var(--border);border-radius:6px;font-size:11px;padding:4px 8px" onclick="deleteOrg(${o.id})">✕ Hapus</button>
+    </div>` : ''}
   </div>`;
 }
+
+// ============ DB MODAL FUNCTIONS ============
+let dbEditId = null, dbNextId = 98;
+
+function openDbModal(id=null) {
+  if(!adminLoggedIn) return;
+  dbEditId=id;
+  document.getElementById('db-modal-title').textContent = id?'Edit Mahasiswa':'Tambah Mahasiswa';
+  if(id) { const m=data.find(d=>d.id===id); document.getElementById('db-f-nama').value=m.nama; document.getElementById('db-f-npm').value=m.npm; document.getElementById('db-f-wa').value=m.wa; }
+  else { ['db-f-nama','db-f-npm','db-f-wa'].forEach(fid=>document.getElementById(fid).value=''); }
+  document.getElementById('db-modal').classList.add('open');
+}
+function closeDbModal() { document.getElementById('db-modal').classList.remove('open'); dbEditId=null; }
+function saveDbData() {
+  const nama=document.getElementById('db-f-nama').value.trim();
+  const npm=document.getElementById('db-f-npm').value.trim();
+  if(!nama||!npm) { alert('Nama dan NPM wajib!'); return; }
+  const entry={id:dbEditId||dbNextId++,nama,npm,wa:document.getElementById('db-f-wa').value.trim()};
+  if(dbEditId) data=data.map(d=>d.id===dbEditId?entry:d); else data.push(entry);
+  closeDbModal(); dbRender(); updateHomeStats();
+}
+function deleteDb(id) {
+  if(!adminLoggedIn) return;
+  const m=data.find(d=>d.id===id);
+  if(confirm(`Hapus ${m.nama}?`)) { data=data.filter(d=>d.id!==id); dbRender(); updateHomeStats(); }
+}
+
+// ============ TA MODAL FUNCTIONS ============
+let taNextId = 98, taEditId = null;
+
+function openTaModal(id=null) {
+  if(!adminLoggedIn) return;
+  taEditId=id;
+  document.getElementById('ta-modal-title').textContent = id?'Edit Data TA':'Tambah Data TA';
+  if(id) {
+    const t=taData.find(d=>d.id===id);
+    document.getElementById('ta-f-nama').value=t.nama;
+    document.getElementById('ta-f-npm').value=t.npm;
+    document.getElementById('ta-f-status').value=t.status;
+    document.getElementById('ta-f-judul').value=t.judul||'';
+    document.getElementById('ta-f-pemb1').value=t.pemb1||'';
+    document.getElementById('ta-f-pemb2').value=t.pemb2||'';
+  } else {
+    ['ta-f-nama','ta-f-npm','ta-f-judul','ta-f-pemb1','ta-f-pemb2'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ta-f-status').value='Belum';
+  }
+  document.getElementById('ta-modal').classList.add('open');
+}
+function closeTaModal() { document.getElementById('ta-modal').classList.remove('open'); taEditId=null; }
+function saveTaData() {
+  const nama=document.getElementById('ta-f-nama').value.trim();
+  const npm=document.getElementById('ta-f-npm').value.trim();
+  if(!nama||!npm) { alert('Nama dan NPM wajib!'); return; }
+  const entry={
+    id:taEditId||taNextId++, nama, npm,
+    status:document.getElementById('ta-f-status').value,
+    judul:document.getElementById('ta-f-judul').value.trim(),
+    pemb1:document.getElementById('ta-f-pemb1').value.trim(),
+    pemb2:document.getElementById('ta-f-pemb2').value.trim(),
+  };
+  if(taEditId) taData=taData.map(d=>d.id===taEditId?entry:d); else taData.push(entry);
+  closeTaModal(); taRender();
+}
+function deleteTa(id) {
+  if(!adminLoggedIn) return;
+  if(confirm('Hapus data TA ini?')) { taData=taData.filter(d=>d.id!==id); taRender(); }
+}
+
+// ============ ORG MODAL FUNCTIONS ============
+function openOrgModal() { if(!adminLoggedIn) return; document.getElementById('org-modal').classList.add('open'); }
+function closeOrgModal() { document.getElementById('org-modal').classList.remove('open'); }
+function saveOrgData() {
+  const nama=document.getElementById('org-f-nama').value.trim();
+  const npm=document.getElementById('org-f-npm').value.trim();
+  if(!nama) { alert('Nama wajib diisi!'); return; }
+  orgData.push({
+    id:orgNextId++, nama, npm,
+    jabatan:document.getElementById('org-f-jabatan').value,
+    divisi:document.getElementById('org-f-divisi').value.trim(),
+  });
+  ['org-f-nama','org-f-npm','org-f-divisi'].forEach(id=>document.getElementById(id).value='');
+  closeOrgModal(); orgRender();
+}
+function deleteOrg(id) {
+  if(!adminLoggedIn) return;
+  if(confirm('Hapus pengurus ini?')) { orgData=orgData.filter(d=>d.id!==id); orgRender(); }
+}
+
+// Close modals on overlay click
+['db-modal','ta-modal','org-modal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => { if(e.target===e.currentTarget) e.target.classList.remove('open'); });
+});
 
 
 
@@ -1530,8 +1923,6 @@ function updateHomeStats() {
   document.getElementById('home-ta-count').textContent = taData.length;
   document.getElementById('home-org-count').textContent = orgData.length;
 }
-
-
 
 // Init
 dbRender();
