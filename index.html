@@ -1023,7 +1023,7 @@ footer span { color: var(--ocean); }
           <button class="view-btn active" id="btn-table" onclick="dbSetView('table')">☰</button>
           <button class="view-btn" id="btn-grid" onclick="dbSetView('grid')">⊞</button>
         </div>
-        <button class="btn-add" onclick="openDbModal()">＋ Tambah</button>
+
       </div>
 
       <div id="db-table-view">
@@ -1035,7 +1035,7 @@ footer span { color: var(--ocean); }
                 <th onclick="dbSort('nama')">Nama ↕</th>
                 <th onclick="dbSort('npm')">NPM ↕</th>
                 <th>No. WA</th>
-                <th>Aksi</th>
+
               </tr>
             </thead>
             <tbody id="db-tbody"></tbody>
@@ -1075,13 +1075,13 @@ footer span { color: var(--ocean); }
           <option value="Proses">🔄 Proses</option>
           <option value="Belum">⏳ Belum</option>
         </select>
-        <button class="btn-add" onclick="openTaModal()">＋ Tambah TA</button>
+
       </div>
 
       <div class="ta-grid" id="ta-grid"></div>
       <div class="empty-state hidden" id="ta-empty">
         <div class="icon">📄</div>
-        <p>Belum ada data TA. Klik "+ Tambah TA" untuk menambahkan.</p>
+        <p>Belum ada data TA.</p>
       </div>
     </div>
   </section>
@@ -1103,90 +1103,12 @@ footer span { color: var(--ocean); }
 
       <div id="org-divisi-container"></div>
 
-      <div style="margin-top:32px;text-align:center">
-        <button class="btn-add" onclick="openOrgModal()">＋ Tambah Pengurus</button>
-      </div>
+
     </div>
   </section>
 </div>
 
-<!-- MODAL DATABASE -->
-<div class="modal-overlay" id="db-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="db-modal-title">Tambah Mahasiswa</div>
-      <button class="modal-close" onclick="closeDbModal()">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="form-group full"><label>Nama Lengkap</label><input type="text" id="db-f-nama" placeholder="Nama lengkap"></div>
-      <div class="form-group"><label>NPM</label><input type="text" id="db-f-npm" placeholder="23012022XXXX"></div>
-      <div class="form-group"><label>No. WhatsApp</label><input type="tel" id="db-f-wa" placeholder="08XXXXXXXXXX"></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-cancel" onclick="closeDbModal()">Batal</button>
-      <button class="btn-save" onclick="saveDbData()">Simpan</button>
-    </div>
-  </div>
-</div>
 
-<!-- MODAL TA -->
-<div class="modal-overlay" id="ta-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="ta-modal-title">Tambah Data TA</div>
-      <button class="modal-close" onclick="closeTaModal()">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="form-group full"><label>Nama Mahasiswa</label><input type="text" id="ta-f-nama" placeholder="Nama lengkap"></div>
-      <div class="form-group"><label>NPM</label><input type="text" id="ta-f-npm" placeholder="23012022XXXX"></div>
-      <div class="form-group">
-        <label>Status TA</label>
-        <select class="form-select" id="ta-f-status">
-          <option value="Belum">⏳ Belum Mulai</option>
-          <option value="Proses">🔄 Sedang Proses</option>
-          <option value="Selesai">✅ Selesai</option>
-        </select>
-      </div>
-      <div class="form-group full"><label>Judul TA</label><input type="text" id="ta-f-judul" placeholder="Judul tugas akhir"></div>
-      <div class="form-group"><label>Pembimbing 1</label><input type="text" id="ta-f-pemb1" placeholder="Nama pembimbing"></div>
-      <div class="form-group"><label>Pembimbing 2</label><input type="text" id="ta-f-pemb2" placeholder="Nama pembimbing (opsional)"></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-cancel" onclick="closeTaModal()">Batal</button>
-      <button class="btn-save" onclick="saveTaData()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ORG -->
-<div class="modal-overlay" id="org-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Tambah Pengurus</div>
-      <button class="modal-close" onclick="closeOrgModal()">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="form-group full"><label>Nama</label><input type="text" id="org-f-nama" placeholder="Nama lengkap"></div>
-      <div class="form-group"><label>NPM</label><input type="text" id="org-f-npm" placeholder="NPM"></div>
-      <div class="form-group">
-        <label>Jabatan</label>
-        <select class="form-select" id="org-f-jabatan">
-          <option>Ketua Umum</option>
-          <option>Wakil Ketua</option>
-          <option>Sekretaris Umum</option>
-          <option>Bendahara Umum</option>
-          <option>Ketua Divisi</option>
-          <option>Anggota Divisi</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Divisi</label><input type="text" id="org-f-divisi" placeholder="Contoh: Akademik, Sosial..."></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-cancel" onclick="closeOrgModal()">Batal</button>
-      <button class="btn-save" onclick="saveOrgData()">Simpan</button>
-    </div>
-  </div>
-</div>
 
 <script>
 // ============ NAVIGATION ============
@@ -1314,7 +1236,7 @@ let data = [
 ];
 let dbNextId = 98;
 let dbView = 'table', dbSortKey = null, dbSortAsc = true;
-let dbEditId = null, dbPage = 1, dbPerPage = 20;
+let dbPage = 1, dbPerPage = 20;
 
 function dbGetFiltered() {
   const q = document.getElementById('db-search').value.toLowerCase();
@@ -1347,10 +1269,7 @@ function dbRender() {
         </div></td>
         <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">${m.npm}</td>
         <td><a class="contact-link" href="https://wa.me/${waLink}" target="_blank">📱 ${m.wa}</a></td>
-        <td>
-          <button class="action-btn" onclick="openDbModal(${m.id})">✎</button>
-          <button class="action-btn del" onclick="deleteDb(${m.id})">✕</button>
-        </td>
+
       </tr>`;
     }).join('');
   }
@@ -1372,10 +1291,7 @@ function dbRender() {
         </div>
         <div class="card-divider"></div>
         <div class="card-row">📱 <a href="https://wa.me/${waLink}" target="_blank">${m.wa}</a></div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="action-btn" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="openDbModal(${m.id})">✎ Edit</button>
-          <button class="action-btn del" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="deleteDb(${m.id})">✕ Hapus</button>
-        </div>
+
       </div>`;
     }).join('');
   }
@@ -1413,29 +1329,7 @@ function dbSetView(v) {
 function dbSort(k) { if(dbSortKey===k) dbSortAsc=!dbSortAsc; else{dbSortKey=k;dbSortAsc=true;} dbRender(); }
 function dbChangePerPage() { dbPerPage=parseInt(document.getElementById('db-perpage').value); dbPage=1; dbRender(); }
 
-function openDbModal(id=null) {
-  dbEditId=id;
-  document.getElementById('db-modal-title').textContent = id?'Edit Mahasiswa':'Tambah Mahasiswa';
-  if(id) { const m=data.find(d=>d.id===id); document.getElementById('db-f-nama').value=m.nama; document.getElementById('db-f-npm').value=m.npm; document.getElementById('db-f-wa').value=m.wa; }
-  else { ['db-f-nama','db-f-npm','db-f-wa'].forEach(fid=>document.getElementById(fid).value=''); }
-  document.getElementById('db-modal').classList.add('open');
-}
 
-function closeDbModal() { document.getElementById('db-modal').classList.remove('open'); dbEditId=null; }
-
-function saveDbData() {
-  const nama=document.getElementById('db-f-nama').value.trim();
-  const npm=document.getElementById('db-f-npm').value.trim();
-  if(!nama||!npm) { alert('Nama dan NPM wajib!'); return; }
-  const entry={id:dbEditId||dbNextId++,nama,npm,wa:document.getElementById('db-f-wa').value.trim()};
-  if(dbEditId) data=data.map(d=>d.id===dbEditId?entry:d); else data.push(entry);
-  closeDbModal(); dbRender(); updateHomeStats();
-}
-
-function deleteDb(id) {
-  const m=data.find(d=>d.id===id);
-  if(confirm(`Hapus ${m.nama}?`)) { data=data.filter(d=>d.id!==id); dbRender(); updateHomeStats(); }
-}
 
 document.getElementById('db-search').addEventListener('input', ()=>{dbPage=1;dbRender();});
 
@@ -1539,7 +1433,7 @@ let taData = [
   {id:96,npm:'230210220108',nama:'Nurhaliza Winda Puspita',peminatan:'Bioteknologi',judul:'Pengaruh Penambahan Palm Wax, ZnO, dan Kaolin Sebagai Agen Hidrofobik terhadap Tingkat Hidrofobisitas Bioplastik Berbasis PVA-Karagenan',pemb1:'Dr. rer. nat. Santi Rukminita Anggraeni, S.T.P., M.Si',pemb2:'Dr. Firda Aulya Syamani, S.T.P., M.Si',status:'Selesai'},
   {id:97,npm:'230210220001',nama:'Alexandra Lidya T S',peminatan:'',judul:'',pemb1:'',pemb2:'',status:'Belum'}
 ];
-let taNextId = 98, taEditId = null;
+
 
 function taGetFiltered() {
   const q = document.getElementById('ta-search').value.toLowerCase();
@@ -1572,53 +1466,13 @@ function taRender() {
         ${t.pemb1?`Pembimbing: <span>${t.pemb1}</span>`:''}<br>
         ${t.pemb2?`Co-Pembimbing: <span>${t.pemb2}</span>`:''}
       </div>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="action-btn" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="openTaModal(${t.id})">✎ Edit</button>
-        <button class="action-btn del" style="flex:1;border:1px solid var(--border);border-radius:8px;font-size:12px" onclick="deleteTa(${t.id})">✕</button>
-      </div>
+
     </div>`;
   }).join('');
   updateHomeStats();
 }
 
-function openTaModal(id=null) {
-  taEditId=id;
-  document.getElementById('ta-modal-title').textContent = id?'Edit Data TA':'Tambah Data TA';
-  if(id) {
-    const t=taData.find(d=>d.id===id);
-    document.getElementById('ta-f-nama').value=t.nama;
-    document.getElementById('ta-f-npm').value=t.npm;
-    document.getElementById('ta-f-status').value=t.status;
-    document.getElementById('ta-f-judul').value=t.judul||'';
-    document.getElementById('ta-f-pemb1').value=t.pemb1||'';
-    document.getElementById('ta-f-pemb2').value=t.pemb2||'';
-  } else {
-    ['ta-f-nama','ta-f-npm','ta-f-judul','ta-f-pemb1','ta-f-pemb2'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('ta-f-status').value='Belum';
-  }
-  document.getElementById('ta-modal').classList.add('open');
-}
 
-function closeTaModal() { document.getElementById('ta-modal').classList.remove('open'); taEditId=null; }
-
-function saveTaData() {
-  const nama=document.getElementById('ta-f-nama').value.trim();
-  const npm=document.getElementById('ta-f-npm').value.trim();
-  if(!nama||!npm) { alert('Nama dan NPM wajib!'); return; }
-  const entry={
-    id:taEditId||taNextId++, nama, npm,
-    status:document.getElementById('ta-f-status').value,
-    judul:document.getElementById('ta-f-judul').value.trim(),
-    pemb1:document.getElementById('ta-f-pemb1').value.trim(),
-    pemb2:document.getElementById('ta-f-pemb2').value.trim(),
-  };
-  if(taEditId) taData=taData.map(d=>d.id===taEditId?entry:d); else taData.push(entry);
-  closeTaModal(); taRender();
-}
-
-function deleteTa(id) {
-  if(confirm('Hapus data TA ini?')) { taData=taData.filter(d=>d.id!==id); taRender(); }
-}
 
 document.getElementById('ta-search').addEventListener('input', taRender);
 document.getElementById('ta-filter').addEventListener('change', taRender);
@@ -1665,31 +1519,11 @@ function orgCardHTML(o, isChief) {
     <div class="org-role">${o.jabatan}</div>
     <div class="org-name">${o.nama}</div>
     <div class="org-npm">${o.npm}</div>
-    <div style="display:flex;gap:6px;margin-top:12px;justify-content:center">
-      <button class="action-btn del" style="border:1px solid var(--border);border-radius:6px;font-size:11px;padding:4px 8px" onclick="deleteOrg(${o.id})">✕</button>
-    </div>
+
   </div>`;
 }
 
-function openOrgModal() { document.getElementById('org-modal').classList.add('open'); }
-function closeOrgModal() { document.getElementById('org-modal').classList.remove('open'); }
 
-function saveOrgData() {
-  const nama=document.getElementById('org-f-nama').value.trim();
-  const npm=document.getElementById('org-f-npm').value.trim();
-  if(!nama) { alert('Nama wajib diisi!'); return; }
-  orgData.push({
-    id:orgNextId++, nama, npm,
-    jabatan:document.getElementById('org-f-jabatan').value,
-    divisi:document.getElementById('org-f-divisi').value.trim(),
-  });
-  ['org-f-nama','org-f-npm','org-f-divisi'].forEach(id=>document.getElementById(id).value='');
-  closeOrgModal(); orgRender();
-}
-
-function deleteOrg(id) {
-  if(confirm('Hapus pengurus ini?')) { orgData=orgData.filter(d=>d.id!==id); orgRender(); }
-}
 
 // ============ HOME STATS ============
 function updateHomeStats() {
@@ -1697,10 +1531,7 @@ function updateHomeStats() {
   document.getElementById('home-org-count').textContent = orgData.length;
 }
 
-// ============ MODAL CLOSE ON OVERLAY ============
-['db-modal','ta-modal','org-modal'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e => { if(e.target===e.currentTarget) e.target.classList.remove('open'); });
-});
+
 
 // Init
 dbRender();
@@ -1708,4 +1539,3 @@ taRender();
 </script>
 </body>
 </html>
-
